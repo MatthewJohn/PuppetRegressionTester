@@ -1,0 +1,10 @@
+#!/bin/bash
+
+wget https://localhost
+
+if [ "$?" != '0' ]
+  exit 0
+else
+  echo 'Did not successfully get local SSL website'
+  exit 1
+fi

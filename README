@@ -1,0 +1,6 @@
+## Installation
+ apt-get install vagrant libtext-template-perl
+
+
+## Install vagrant images
+
