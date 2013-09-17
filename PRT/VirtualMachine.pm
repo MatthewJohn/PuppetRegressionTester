@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use File::Temp;
+use File::Copy;
 use Text::Template;
 
 sub new
@@ -18,22 +19,31 @@ sub new
     $class
   );
   $self->{'running'} = 0;
+  $self->{'install_script'} = 'install';
 
   return $self;
 }
 
-sub runTest
+sub execute
 {
   my ($self) = @_;
 
   $self->createBaseDirectory();
   $self->createVirtualMachine();
-  $self->createVagrantConfig();
+  $self->createConfigurationFiles();
   $self->startMachine();
+  $self->configureVirtualMachine();
+
+  $self->runTest();
 
   $self->stopMachine();
   $self->destroyMachine();
   $self->deleteBaseDirectory();
+}
+
+sub runTest
+{
+  print "I would have run a test";
 }
 
 sub destroyMachine
@@ -60,6 +70,21 @@ sub createVirtualMachine
   {
     print "Error creating machine: $output\n";
   }
+}
+
+sub createConfigurationFiles
+{
+  my ($self) = @_;
+
+  # Create the main vagrant configuration
+  $self->createVagrantConfig();
+
+  # Copy the installation script it on the machine
+  copy
+  (
+    $PRT::Config::SCRIPT_PATH . '/' . $self->{'install_script'},
+    $self->{'base_directory'} . '/' . $self->{'install_script'}
+  );
 }
 
 sub createVagrantConfig
@@ -158,6 +183,15 @@ sub runVagrantCommand
   my $output = `VAGRANT_CWD=$vagrant_vm_path $vagrant_bin_path @args`;
   my $exit_code = $?;
 
+  return ($exit_code, $output);
+}
+
+sub runVMCommand
+{
+  # Get arguments
+  my ($self, @args) = @_;
+
+  my ($exit_code, $output) = $self->runVagrantCommand('ssh', '--command', @args);
   return ($exit_code, $output);
 }
 

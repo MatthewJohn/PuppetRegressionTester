@@ -1,5 +1,5 @@
 ## Installation
- apt-get install vagrant libtext-template-perl
+ apt-get install vagrant libtext-template-perl libfile-touch-perl
 
 
 ## Install vagrant images

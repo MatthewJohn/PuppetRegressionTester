@@ -1,5 +1,8 @@
 package PRT::Config;
 
+use strict;
+use warnings;
+
 use Exporter qw(import);
 our @EXPORT_OK = qw();
 
@@ -10,6 +13,8 @@ use FindBin;
 our $VAGRANT_PATH = '/usr/bin/vagrant';
 our $APP_BASE_DIR = abs_path($0);
 $APP_BASE_DIR = $FindBin::Bin;
+our $SCRIPT_PATH = $APP_BASE_DIR . '/scripts';
+our $LOG_BASE_DIR = $APP_BASE_DIR . '/logs';
 
 # Vagrant VM shared path
 our $VM_SHARE_PATH = '/vagrant';
