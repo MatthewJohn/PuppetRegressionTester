@@ -32,7 +32,7 @@ sub runTest
   $self->startMachine();
 
   $self->stopMachine();
-  $self->destoryMachine();
+  $self->destroyMachine();
   $self->deleteBaseDirectory();
 }
 
@@ -42,12 +42,12 @@ sub destroyMachine
 
   if ($self->{'running'} == 0)
   {
-    $self->runVagrantCommand('destroy');
+    $self->runVagrantCommand('destroy', '-f');
     $self->{'running'} = 0;
   }
   else
   {
-    print("VM not running");
+    print("VM not running\n");
   }
 }
 
@@ -79,7 +79,7 @@ sub createVagrantConfig
   ) or die "Couldn't construct template: $Text::Template::ERROR";
 
   my $config_output = $config_template->fill_in(HASH => \%config_variables);
-print $config_output;
+
   # Overwrite config file with new one from template
   open(config_file_fh, ' > ', $config_path);
   print(config_file_fh $config_output);
@@ -133,7 +133,7 @@ sub startMachine
 
     if ($exit_code)
     {
-      die('unhappy:' . $output);
+      die('Unable to start VM:' . $output);
     }
 
     $self->{'running'} = 1;
