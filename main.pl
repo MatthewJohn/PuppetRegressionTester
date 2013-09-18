@@ -21,3 +21,5 @@ my $virtual_machine = PRT::VirtualMachine->new
   test => $test1
 );
 $virtual_machine->execute();
+
+$PRT::Logger::main_logger->log('Completed all tests');

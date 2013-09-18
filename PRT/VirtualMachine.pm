@@ -45,7 +45,7 @@ sub runTest
 {
   my ($self) = @_;
 
-  $self->{'test'}->{'logger'}->log('I would have run a test');
+  $self->{'test'}->{'logger'}->warn('I would have run a test');
 }
 
 sub destroyMachine
@@ -59,7 +59,7 @@ sub destroyMachine
   }
   else
   {
-    print("VM not running\n");
+    $self->{'test'}->{'logger'}->warn('VM running');
   }
 }
 
@@ -70,7 +70,7 @@ sub createVirtualMachine
   my ($exit_code, $output) = $self->runVagrantCommand('init');
   if ($exit_code)
   {
-    print "Error creating machine: $output\n";
+    $self->{'test'}->{'logger'}->error('Error creating machine:', $output);
   }
 }
 
@@ -140,6 +140,7 @@ sub deleteBaseDirectory
   my ($self) = @_;
 
   unlink($self->{'base_directory'});
+  $self->{'test'}->{'logger'}->error('Test Error');
 }
 
 sub stopMachine

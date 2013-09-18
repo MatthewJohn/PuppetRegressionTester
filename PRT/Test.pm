@@ -26,7 +26,7 @@ sub new
   $self->checkExists();
 
   $self->{'logger'} = PRT::Logger->new(name => 'test_' . $self->{'test_id'});
-  $self->{'logger'}->log('Test log initialized');
+  $self->{'logger'}->log('Test \'' . $self->{'test_id'} . '\' initialized');
 
   return $self;
 }
@@ -37,7 +37,7 @@ sub checkExists
 
   if (! -d $self->{'base_directory'})
   {
-    $PRT::Logger::main_logger->log('Error: test \'' . $self->{'test_id'} . "' does not exist\n");
+    $PRT::Logger::main_logger->log('Error: Test \'' . $self->{'test_id'} . '\' does not exist');
     die();
   }
 }
