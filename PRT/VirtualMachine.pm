@@ -43,7 +43,9 @@ sub execute
 
 sub runTest
 {
-  print "I would have run a test";
+  my ($self) = @_;
+
+  $self->{'test'}->{'logger'}->log('I would have run a test');
 }
 
 sub destroyMachine
