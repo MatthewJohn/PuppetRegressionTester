@@ -80,6 +80,17 @@ sub error
   }
 }
 
+sub debug
+{
+  my ($self, @message) = @_;
+
+  if ($PRT::Config::DEBUG)
+  {
+    $message[0] = 'DEBUG: ' . $message[0];
+    $self->log(@message);
+  }
+}
+
 sub DESTROY
 {
   my $self = shift;

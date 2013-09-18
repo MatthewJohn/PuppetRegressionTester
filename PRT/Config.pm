@@ -20,6 +20,9 @@ our $TEST_BASE_DIR = $APP_BASE_DIR . '/tests';
 # Vagrant VM shared path
 our $VM_SHARE_PATH = '/vagrant';
 
+# Debug logging
+our $DEBUG = 1;
+
 # Configure vagrant images
 our %VAGRANT_BOXES =
 (

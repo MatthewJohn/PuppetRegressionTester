@@ -110,7 +110,8 @@ sub createVagrantConfig
   (
     TYPE => 'FILE',
     SOURCE => $template_path
-  ) or die "Couldn't construct template: $Text::Template::ERROR";
+  ) or
+    $self->{'test'}->{'logger'}->error("Couldn't construct template: $Text::Template::ERROR");
 
   my $config_output = $config_template->fill_in(HASH => \%config_variables);
 
@@ -140,7 +141,6 @@ sub deleteBaseDirectory
   my ($self) = @_;
 
   unlink($self->{'base_directory'});
-  $self->{'test'}->{'logger'}->error('Test Error');
 }
 
 sub stopMachine
@@ -154,7 +154,7 @@ sub stopMachine
   }
   else
   {
-    print "VM already stopped\n";
+    $self->{'test'}->{'logger'}->warn('VM already stopped');
   }
 }
 
@@ -175,7 +175,7 @@ sub startMachine
   }
   else
   {
-    print "VM already started\n";
+    $self->{'test'}->{'logger'}->warn('VM already started');
   }
 }
 
@@ -189,8 +189,9 @@ sub runVagrantCommand
   my $vagrant_bin_path = $PRT::Config::VAGRANT_PATH;
 
   # Complile and run command and get output
-  print "Running command 'VAGRANT_CWD=$vagrant_vm_path $vagrant_bin_path @args'\n";
-  my $output = `VAGRANT_CWD=$vagrant_vm_path $vagrant_bin_path @args`;
+  my $command = "VAGRANT_CWD=$vagrant_vm_path $vagrant_bin_path @args";
+  $self->{'test'}->{'logger'}->debug("Running command: $command");
+  my $output = `$command`;
   my $exit_code = $?;
 
   return ($exit_code, $output);
