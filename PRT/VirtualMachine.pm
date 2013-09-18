@@ -19,33 +19,46 @@ sub new
     $class
   );
   $self->{'running'} = 0;
-  $self->{'install_script'} = 'install';
+  $self->{'base_install_script'} = 'install';
 
   return $self;
 }
 
-sub execute
+sub runTestMachine
+{
+  my ($self, $master_server_object) = @_;
+
+  $self->createBaseDirectory();
+  $self->createVirtualMachine();
+  $self->createConfigurationFiles('client');
+  $self->startMachine();
+  $self->configureVirtualMachine();
+
+  # Run main tests
+  $self->runTest();
+
+  # Destroy
+  $self->stopAndDestroy();
+}
+
+sub setupMaster
 {
   my ($self) = @_;
 
   $self->createBaseDirectory();
   $self->createVirtualMachine();
-  $self->createConfigurationFiles();
+  $self->createConfigurationFiles('master');
   $self->startMachine();
   $self->configureVirtualMachine();
+}
 
-  $self->runTest();
+sub stopAndDestroy
+{
+  my ($self) = @_;
 
   $self->stopMachine();
   $self->destroyMachine();
   $self->deleteBaseDirectory();
-}
-
-sub runTest
-{
-  my ($self) = @_;
-
-  $self->{'test'}->{'logger'}->warn('I would have run a test');
 }
 
 sub destroyMachine
@@ -59,8 +72,15 @@ sub destroyMachine
   }
   else
   {
-    $self->{'test'}->{'logger'}->warn('VM running');
+    $self->{'logger'}->warn('VM running');
   }
+}
+
+sub runTest
+{
+  my ($self) = @_;
+
+  $self->{'logger'}->log('Would run a test here');
 }
 
 sub createVirtualMachine
@@ -70,7 +90,7 @@ sub createVirtualMachine
   my ($exit_code, $output) = $self->runVagrantCommand('init');
   if ($exit_code)
   {
-    $self->{'test'}->{'logger'}->error('Error creating machine:', $output);
+    $self->{'logger'}->error('Error creating machine:', $output);
   }
 }
 
@@ -83,7 +103,7 @@ sub configureVirtualMachine
 
 sub createConfigurationFiles
 {
-  my ($self) = @_;
+  my ($self, $install_type) = @_;
 
   # Create the main vagrant configuration
   $self->createVagrantConfig();
@@ -91,8 +111,8 @@ sub createConfigurationFiles
   # Copy the installation script it on the machine
   copy
   (
-    $PRT::Config::SCRIPT_PATH . '/' . $self->{'install_script'},
-    $self->{'base_directory'} . '/' . $self->{'install_script'}
+    $PRT::Config::SCRIPT_PATH . '/' . $self->{'base_install_script'} . '_' . $install_type,
+    $self->{'base_directory'} . '/' . $self->{'base_install_script'}
   );
 }
 
@@ -111,7 +131,7 @@ sub createVagrantConfig
     TYPE => 'FILE',
     SOURCE => $template_path
   ) or
-    $self->{'test'}->{'logger'}->error("Couldn't construct template: $Text::Template::ERROR");
+    $self->{'logger'}->error("Couldn't construct template: $Text::Template::ERROR");
 
   my $config_output = $config_template->fill_in(HASH => \%config_variables);
 
@@ -155,7 +175,7 @@ sub stopMachine
   }
   else
   {
-    $self->{'test'}->{'logger'}->warn('VM already stopped');
+    $self->{'logger'}->warn('VM already stopped');
   }
 }
 
@@ -169,14 +189,14 @@ sub startMachine
 
     if ($exit_code)
     {
-      $self->{'test'}->{'logger'}->error('Unable to start VM:', $output);
+      $self->{'logger'}->error('Unable to start VM:', $output);
     }
 
     $self->{'running'} = 1;
   }
   else
   {
-    $self->{'test'}->{'logger'}->warn('VM already started');
+    $self->{'logger'}->warn('VM already started');
   }
 }
 
@@ -191,16 +211,16 @@ sub runVagrantCommand
 
   # Complile and run command and get output
   my $command = "VAGRANT_CWD=$vagrant_vm_path $vagrant_bin_path @args";
-  $self->{'test'}->{'logger'}->debug("Running command: $command");
+  $self->{'logger'}->debug("Running command: $command");
   my ($exit_code, $output) = PRT::runCommand($command, 1);
 
   if ($exit_code)
   {
-    $self->{'test'}->{'logger'}->warn('Error whilst running command \'' . $command, 'Exit Code: ' . $exit_code, 'Output: ' . $output);
+    $self->{'logger'}->warn('Error whilst running command \'' . $command, 'Exit Code: ' . $exit_code, 'Output: ' . $output);
   }
   else
   {
-    $self->{'test'}->{'logger'}->debug('Command output:', $output);
+    $self->{'logger'}->debug('Command output:', $output);
   }
 
   return ($exit_code, $output);
@@ -218,7 +238,7 @@ sub runVMCommand
   }
   else
   {
-    $self->{'test'}->{'logger'}->warn('VM not running whilst trying to perform command: ' . @args);
+    $self->{'logger'}->warn('VM not running whilst trying to perform command: ' . @args);
     return (-1, 'VM not running');
   }
 }

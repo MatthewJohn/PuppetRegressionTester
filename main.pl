@@ -14,13 +14,23 @@ use PRT::Test;
 use PRT::VirtualMachine;
 use Data::Dumper;
 
-my $test1 = PRT::Test->new(test_id => 1);
-
-my $virtual_machine = PRT::VirtualMachine->new
+# Setup puppet master
+our $puppet_master = PRT::VirtualMachine->new
 (
   vm_type => $PRT::Config::VAGRANT_BOXES{'1'},
-  test => $test1
+  logger => $PRT::Logger::main_logger
 );
-$virtual_machine->execute();
+$puppet_master->setupMaster();
 
+# Setup and run tests
+my $test1 = PRT::Test->new(test_id => 1);
+
+my $virtual_machine = $test1->createVM
+(
+  $PRT::Config::VAGRANT_BOXES{'1'}
+);
+$virtual_machine->runTestMachine();
+
+# Stopping puppet master
+$puppet_master->stopAndDestroy();
 $PRT::Logger::main_logger->log('Completed all tests');

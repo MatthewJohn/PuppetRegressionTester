@@ -19,9 +19,9 @@ sub new
   );
   if (!$self->{'test_id'})
   {
-    $PRT::Logger::main_logger->log("Error: test_id not defined\n");
-    die();
+    $PRT::Logger::main_logger->error('test_id not defined');
   }
+
   $self->{'base_directory'} = $PRT::Config::TEST_BASE_DIR . '/' . $self->{'test_id'};
   $self->checkExists();
 
@@ -31,14 +31,25 @@ sub new
   return $self;
 }
 
+sub createVM
+{
+  my ($self, $vm_config) = @_;
+
+  return PRT::VirtualMachine->new
+  (
+    vm_type => $vm_config,
+    logger => $self->{'logger'},
+    test => $self
+  );
+}
+
 sub checkExists
 {
   my ($self) = @_;
 
   if (! -d $self->{'base_directory'})
   {
-    $PRT::Logger::main_logger->log('Error: Test \'' . $self->{'test_id'} . '\' does not exist');
-    die();
+    $PRT::Logger::main_logger->error('Test \'' . $self->{'test_id'} . '\' does not exist');
   }
 }
 
