@@ -130,7 +130,8 @@ sub createBaseDirectory
   my $temp_dir = File::Temp->newdir
   (
     TEMPLATE => $directory_name,
-    DIR => $base_directory
+    DIR => $base_directory,
+    UNLINK => 0
   );
 
   $self->{'base_directory'} = $temp_dir;
@@ -149,7 +150,7 @@ sub stopMachine
 
   if ($self->{'running'} == 1)
   {
-    $self->runVagrantCommand('down');
+    $self->runVagrantCommand('halt');
     $self->{'running'} = 0;
   }
   else
@@ -168,7 +169,7 @@ sub startMachine
 
     if ($exit_code)
     {
-      die('Unable to start VM:' . $output);
+      $self->{'test'}->{'logger'}->error('Unable to start VM:', $output);
     }
 
     $self->{'running'} = 1;
@@ -191,8 +192,16 @@ sub runVagrantCommand
   # Complile and run command and get output
   my $command = "VAGRANT_CWD=$vagrant_vm_path $vagrant_bin_path @args";
   $self->{'test'}->{'logger'}->debug("Running command: $command");
-  my $output = `$command`;
-  my $exit_code = $?;
+  my ($exit_code, $output) = PRT::runCommand($command, 1);
+
+  if ($exit_code)
+  {
+    $self->{'test'}->{'logger'}->warn('Error whilst running command \'' . $command, 'Exit Code: ' . $exit_code, 'Output: ' . $output);
+  }
+  else
+  {
+    $self->{'test'}->{'logger'}->debug('Command output:', $output);
+  }
 
   return ($exit_code, $output);
 }
@@ -202,8 +211,16 @@ sub runVMCommand
   # Get arguments
   my ($self, @args) = @_;
 
-  my ($exit_code, $output) = $self->runVagrantCommand('ssh', '--command', @args);
-  return ($exit_code, $output);
+  if ($self->{'running'})
+  {
+    my ($exit_code, $output) = $self->runVagrantCommand('ssh', '--command', @args);
+    return ($exit_code, $output);
+  }
+  else
+  {
+    $self->{'test'}->{'logger'}->warn('VM not running whilst trying to perform command: ' . @args);
+    return (-1, 'VM not running');
+  }
 }
 
 1;

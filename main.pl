@@ -9,6 +9,7 @@ use POSIX qw(strftime);
 use lib "$FindBin::Bin/";
 use PRT::Config;
 use PRT::Logger;
+use PRT;
 use PRT::Test;
 use PRT::VirtualMachine;
 use Data::Dumper;
