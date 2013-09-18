@@ -20,7 +20,7 @@ sub runCommand
     $PRT::Logger::main_logger->debug("Running command: $command");
   }
 
-  my $output = `$command`;
+  my $output = `$command 2>&1`;
   my $exit_code = $?;
 
   # If logging, log any error output, else debug log the output
