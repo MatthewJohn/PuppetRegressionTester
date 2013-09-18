@@ -72,6 +72,13 @@ sub createVirtualMachine
   }
 }
 
+sub configureVirtualMachine
+{
+  my ($self) = @_;
+
+  # Run the installation and configuration files
+}
+
 sub createConfigurationFiles
 {
   my ($self) = @_;

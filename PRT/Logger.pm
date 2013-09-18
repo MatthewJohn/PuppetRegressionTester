@@ -26,7 +26,7 @@ sub new
   $self->{'file_name'} = $self->{'name'} || 'main';
   $self->{'file'} = $PRT::Logger::log_path . '/' . $self->{'file_name'};
   touch($self->{'file'});
-  open $self->{LOG_FH}, ' > ', $self->{'file'};
+  $self->{'LOG_FH'} = FileHandle->new($self->{'file'}, '>');
 
   return $self;
 }
@@ -37,13 +37,13 @@ sub log
 
   my $append = strftime("%Y%m%d %H:%M:%S", localtime);
   my $log_message = $append . $message . "\n";
-  print $self->{'LOG_FH'} $log_message;
+  print {$self->{'LOG_FH'}} $log_message;
 }
 
 sub DESTROY
 {
   my $self = shift;
-  $self->{LOG_FH}->close;
+  undef $self->{LOG_FH};
 }
 
 1;
