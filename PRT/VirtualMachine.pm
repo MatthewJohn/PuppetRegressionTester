@@ -99,6 +99,7 @@ sub configureVirtualMachine
   my ($self) = @_;
 
   # Run the installation and configuration files
+  $self->runVMCommand('sudo', 'bash', $PRT::Config::VM_SHARE_PATH . '/' . $self->{'base_install_script'});
 }
 
 sub createConfigurationFiles
@@ -233,7 +234,7 @@ sub runVMCommand
 
   if ($self->{'running'})
   {
-    my ($exit_code, $output) = $self->runVagrantCommand('ssh', '--command', @args);
+    my ($exit_code, $output) = $self->runVagrantCommand('ssh', "--command='@args'");
     return ($exit_code, $output);
   }
   else

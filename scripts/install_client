@@ -5,8 +5,15 @@ if [ -f /etc/debian_version ]
 then
   echo 'Detected a debian-based operating system'
 
-  # Update package list
+  # Install puppet apt repository and gpgkey
+  wget http://apt.puppetlabs.com/puppetlabs-release-precise.deb
+  dpkg -i puppetlabs-release-precise.deb
+  rm puppetlabs-release-precise.deb
+
+  # Update and install puppet
   apt-get update
+  apt-get dist-upgrade -y --assume-yes
+  apt-get install puppet -y --assume-yes
 
 elif [ -f /etc/redhat-release ]
 then

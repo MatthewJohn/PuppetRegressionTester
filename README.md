@@ -4,9 +4,11 @@ Puppet Regression Tester
 ## Installation
 
 * Install the required packages:
-```apt-get install vagrant libtext-template-perl libfile-touch-perl```
+
+```apt-get install vagrant libtext-template-perl libfile-touch-perl perl-tk```
 
 * Create the local directories
+
 ```mkdir logs vagrant```
 
 ## Install vagrant images
