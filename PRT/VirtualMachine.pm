@@ -6,6 +6,7 @@ use warnings;
 use File::Temp;
 use File::Copy;
 use Text::Template;
+use File::Copy::Recursive;
 
 sub new
 {
@@ -20,14 +21,28 @@ sub new
   );
   $self->{'running'} = 0;
   $self->{'base_install_script'} = 'install';
+  $self->{'directory_exists'} = 0;
+
+  $self->{'name'} = generateName();
+  print "Giving machine name: " . $self->{'name'} . "\n";
 
   return $self;
+}
+
+sub generateName
+{
+  my @chars = ("A".."Z", "a".."z");
+  my $string;
+  $string .= $chars[rand @chars] for 1..8;
+
+  return $string;
 }
 
 sub runTestMachine
 {
   my ($self, $master_server_object) = @_;
 
+  $self->{'master'} = $master_server_object;
   $self->createBaseDirectory();
   $self->createVirtualMachine();
   $self->createConfigurationFiles('client');
@@ -99,7 +114,12 @@ sub configureVirtualMachine
   my ($self) = @_;
 
   # Run the installation and configuration files
-  $self->runVMCommand('sudo', 'bash', $PRT::Config::VM_SHARE_PATH . '/' . $self->{'base_install_script'});
+  my ($exit_code, $output) = $self->runVMCommand('sudo', 'bash', $PRT::Config::VM_SHARE_PATH . '/' . $self->{'base_install_script'});
+
+  if ($exit_code)
+  {
+    $self->{'logger'}->error('Failed to configure VM: ', $output);
+  }
 }
 
 sub createConfigurationFiles
@@ -115,6 +135,12 @@ sub createConfigurationFiles
     $PRT::Config::SCRIPT_PATH . '/' . $self->{'base_install_script'} . '_' . $install_type,
     $self->{'base_directory'} . '/' . $self->{'base_install_script'}
   );
+
+  # If performing master configuration, copy the puppet module
+  if ($install_type eq 'master')
+  {
+    File::Copy::Recursive::dircopy($PRT::Config::PUPPET_BASE_DIR, $self->{'base_directory'} . '/puppet/');
+  }
 }
 
 sub createVagrantConfig
@@ -125,7 +151,8 @@ sub createVagrantConfig
   my $template_path = $PRT::Config::APP_BASE_DIR . '/templates/Vagrantfile.tmpl';
   my %config_variables =
   (
-    'box_name' => $self->{'vm_type'}{'box_name'}
+    'box_name' => $self->{'vm_type'}{'box_name'},
+    'host_name' => $self->{'name'}
   );
   my $config_template = Text::Template->new
   (
@@ -156,6 +183,12 @@ sub createBaseDirectory
   );
 
   $self->{'base_directory'} = $temp_dir;
+  $self->{'directory_exists'} = 1;
+}
+
+sub connectToMaster
+{
+  my ($self)
 }
 
 sub deleteBaseDirectory
@@ -163,6 +196,7 @@ sub deleteBaseDirectory
   my ($self) = @_;
 
   unlink($self->{'base_directory'});
+  $self->{'directory_exists'} = 0;
 }
 
 sub stopMachine
@@ -243,5 +277,20 @@ sub runVMCommand
     return (-1, 'VM not running');
   }
 }
+
+#sub DESTROY
+#{
+#  my ($self) = @_;
+
+#  if ($self->{'running'})
+#  {
+#    $self->stopMachine();
+#  }
+
+#  if ($self->{'directory_exists'})
+#  {
+#    $self->deleteBaseDirectory();
+#  }
+#}
 
 1;

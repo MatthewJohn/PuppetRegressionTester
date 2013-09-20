@@ -3,9 +3,6 @@ package PRT::Config;
 use strict;
 use warnings;
 
-#use Exporter qw(import);
-#our @EXPORT_OK = qw();
-
 use Cwd 'abs_path';
 use FindBin;
 
@@ -16,6 +13,7 @@ $APP_BASE_DIR = $FindBin::Bin;
 our $SCRIPT_PATH = $APP_BASE_DIR . '/scripts';
 our $LOG_BASE_DIR = $APP_BASE_DIR . '/logs';
 our $TEST_BASE_DIR = $APP_BASE_DIR . '/tests';
+our $PUPPET_BASE_DIR = $APP_BASE_DIR . '/puppet';
 
 # Vagrant VM shared path
 our $VM_SHARE_PATH = '/vagrant';

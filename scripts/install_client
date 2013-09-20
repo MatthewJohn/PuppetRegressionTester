@@ -12,7 +12,6 @@ then
 
   # Update and install puppet
   apt-get update
-  apt-get dist-upgrade -y --assume-yes
   apt-get install puppet -y --assume-yes
 
 elif [ -f /etc/redhat-release ]

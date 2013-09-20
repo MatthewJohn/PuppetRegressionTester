@@ -61,6 +61,7 @@ apt-get install -y puppetmaster puppet-common puppetdb puppetdb-terminus
 # and checkout the puppet configuration from company-servers
 /etc/init.d/puppetmaster stop
 mv /etc/puppet /etc/puppet.bak
+ls -ls /vagrant
 cp -r /vagrant/puppet /etc/puppet
 
 # Configure puppet-master

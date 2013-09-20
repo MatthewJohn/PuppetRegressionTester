@@ -8,3 +8,8 @@ logs/
 # Vagrant Machines #
 ####################
 vagrant/
+
+########################
+# Puppet Configuration #
+########################
+puppet/
