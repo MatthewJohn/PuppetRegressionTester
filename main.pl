@@ -12,15 +12,17 @@ use PRT::Logger;
 use PRT;
 use PRT::Test;
 use PRT::VirtualMachine;
+use PRT::VirtualMachine::Master;
+use PRT::VirtualMachine::TestMachine;
+use PRT::VirtualMachine::Proxy;
 use Data::Dumper;
 
 # Setup puppet master
-our $puppet_master = PRT::VirtualMachine->new
+our $puppet_master = PRT::VirtualMachine::Master->new
 (
-  vm_type => $PRT::Config::VAGRANT_BOXES{'1'},
   logger => $PRT::Logger::main_logger
 );
-$puppet_master->setupMaster();
+$puppet_master->configure();
 
 # Setup and run tests
 my $test1 = PRT::Test->new(test_id => 1);

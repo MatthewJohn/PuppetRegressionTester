@@ -16,7 +16,7 @@ function set_key_value
   key=$2
   delimiter=$3
   value=$4
-  sed --in-place='' --expression="s/^[[:space:]]*#*[[:space:]]*$key[[:space:]]*$delimiter.*\$/$key$delimiter$value/g" $file
+  sudo sed --in-place='' --expression="s/^[[:space:]]*#*[[:space:]]*$key[[:space:]]*$delimiter.*\$/$key$delimiter$value/g" $file
 }
 
 # Ensure user is root
@@ -30,17 +30,17 @@ DOMAIN=`cat /etc/resolv.conf  | grep search | awk '{ print $2 }'`
 
 # Install puppet apt repository and gpgkey
 wget http://apt.puppetlabs.com/puppetlabs-release-precise.deb
-dpkg -i puppetlabs-release-precise.deb
+sudo dpkg -i puppetlabs-release-precise.deb
 rm puppetlabs-release-precise.deb
-apt-get update
+sudo apt-get update
 
 # Create required variables and set as lowercase, as this is needed for puppet-dashboard certificates
 LCASE_HOSTNAME=${HOSTNAME,,}
 
 # Install ruby pre-requisites for puppet-dashboard
-apt-get install -y build-essential irb libmysql-ruby libmysqlclient-dev \
-                   libopenssl-ruby libreadline-ruby rake rdoc \
-                   ri ruby ruby-dev
+sudo apt-get install -y build-essential irb libmysql-ruby libmysqlclient-dev \
+  libopenssl-ruby libreadline-ruby rake rdoc \
+  ri ruby ruby-dev
 
 # Installs the correct version of rubygems, needed for puppet-dashboard
 (
@@ -51,29 +51,29 @@ apt-get install -y build-essential irb libmysql-ruby libmysqlclient-dev \
  wget -c -t10 -T20 -q $URL && \
  tar xfz $PACKAGE.tgz && \
  cd $PACKAGE && \
- sudo ruby setup.rb
+ sudo sudo ruby setup.rb
 )
 
 # Install packages and depencies
-apt-get install -y puppetmaster puppet-common puppetdb puppetdb-terminus
+sudo apt-get install -y puppetmaster puppet-common puppetdb puppetdb-terminus
 
 # Stop puppetmaster and Move puppet configuration directory
 # and checkout the puppet configuration from company-servers
-/etc/init.d/puppetmaster stop
-mv /etc/puppet /etc/puppet.bak
+sudo /etc/init.d/puppetmaster stop
+sudo mv /etc/puppet /etc/puppet.bak
 ls -ls /vagrant
-cp -r /vagrant/puppet /etc/puppet
+sudo cp -r /vagrant/puppet /etc/puppet
 
 # Configure puppet-master
 set_key_value '/etc/puppet/puppet.conf' 'dns_alt_names' ' = ' "puppet-master,puppet-master.$DOMAIN,$LCASE_HOSTNAME,$LCASE_HOSTNAME.$DOMAIN"
 set_key_value '/etc/default/puppetmaster' 'start' '=' 'yes'
-/etc/init.d/puppetmaster start
+sudo /etc/init.d/puppetmaster start
 
 # Configure puppet DB
 set_key_value '/etc/puppet/puppetdb.conf' 'server' ' = ' "$LCASE_HOSTNAME.$DOMAIN"
 
 # Restart puppetdb and puppet-master
-/etc/init.d/puppetdb restart
-/etc/init.d/puppetmaster restart
+sudo /etc/init.d/puppetdb restart
+sudo /etc/init.d/puppetmaster restart
 
 echo "The installation is complete."

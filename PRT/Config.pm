@@ -19,7 +19,7 @@ our $PUPPET_BASE_DIR = $APP_BASE_DIR . '/puppet';
 our $VM_SHARE_PATH = '/vagrant';
 
 # Debug logging
-our $DEBUG = 1;
+our $DEBUG = 0;
 
 # Configure vagrant images
 our %VAGRANT_BOXES =

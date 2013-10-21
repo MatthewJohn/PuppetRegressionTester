@@ -8,6 +8,8 @@ use File::Copy;
 use Text::Template;
 use File::Copy::Recursive;
 
+use PRT::Logger;
+
 sub new
 {
   my ($class, %args) = @_;
@@ -38,35 +40,6 @@ sub generateName
   return $string;
 }
 
-sub runTestMachine
-{
-  my ($self, $master_server_object) = @_;
-
-  $self->{'master'} = $master_server_object;
-  $self->createBaseDirectory();
-  $self->createVirtualMachine();
-  $self->createConfigurationFiles('client');
-  $self->startMachine();
-  $self->configureVirtualMachine();
-
-  # Run main tests
-  $self->runTest();
-
-  # Destroy
-  $self->stopAndDestroy();
-}
-
-sub setupMaster
-{
-  my ($self) = @_;
-
-  $self->createBaseDirectory();
-  $self->createVirtualMachine();
-  $self->createConfigurationFiles('master');
-  $self->startMachine();
-  $self->configureVirtualMachine();
-}
-
 sub stopAndDestroy
 {
   my ($self) = @_;
@@ -89,13 +62,6 @@ sub destroyMachine
   {
     $self->{'logger'}->warn('VM running');
   }
-}
-
-sub runTest
-{
-  my ($self) = @_;
-
-  $self->{'logger'}->log('Would run a test here');
 }
 
 sub createVirtualMachine
@@ -184,11 +150,6 @@ sub createBaseDirectory
 
   $self->{'base_directory'} = $temp_dir;
   $self->{'directory_exists'} = 1;
-}
-
-sub connectToMaster
-{
-  my ($self)
 }
 
 sub deleteBaseDirectory

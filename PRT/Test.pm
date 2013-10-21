@@ -3,6 +3,8 @@ package PRT::Test;
 use strict;
 use warnings;
 
+use PRT::VirtualMachine;
+use PRT::VirtualMachine::TestMachine;
 #use Exporter qw(import);
 #our @EXPORT_OK = qw();
 
@@ -17,6 +19,7 @@ sub new
     },
     $class
   );
+
   if (!$self->{'test_id'})
   {
     $PRT::Logger::main_logger->error('test_id not defined');
@@ -35,7 +38,7 @@ sub createVM
 {
   my ($self, $vm_config) = @_;
 
-  return PRT::VirtualMachine->new
+  return PRT::VirtualMachine::TestMachine->new
   (
     vm_type => $vm_config,
     logger => $self->{'logger'},
