@@ -239,19 +239,4 @@ sub runVMCommand
   }
 }
 
-#sub DESTROY
-#{
-#  my ($self) = @_;
-
-#  if ($self->{'running'})
-#  {
-#    $self->stopMachine();
-#  }
-
-#  if ($self->{'directory_exists'})
-#  {
-#    $self->deleteBaseDirectory();
-#  }
-#}
-
 1;
