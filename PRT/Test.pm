@@ -20,7 +20,7 @@ sub new
     $class
   );
 
-  if (!$self->{'test_id'})
+  unless ($self->{'test_id'})
   {
     $PRT::Logger::main_logger->error('test_id not defined');
   }
@@ -50,7 +50,7 @@ sub checkExists
 {
   my ($self) = @_;
 
-  if (! -d $self->{'base_directory'})
+  unless (-d $self->{'base_directory'})
   {
     $PRT::Logger::main_logger->error('Test \'' . $self->{'test_id'} . '\' does not exist');
   }

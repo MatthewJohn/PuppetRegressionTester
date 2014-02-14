@@ -15,7 +15,7 @@ sub runCommand
   my $no_log = shift || 0;
 
   # If logging, DEBUG log the command
-  if (!$no_log)
+  unless ($no_log)
   {
     $PRT::Logger::main_logger->debug("Running command: $command");
   }
@@ -24,7 +24,7 @@ sub runCommand
   my $exit_code = $?;
 
   # If logging, log any error output, else debug log the output
-  if (! $no_log)
+  unless ($no_log)
   {
     if ($exit_code)
     {

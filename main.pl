@@ -11,11 +11,16 @@ use PRT::Config;
 use PRT::Logger;
 use PRT;
 use PRT::Test;
+use PRT::Hypervisor;
 use PRT::VirtualMachine;
 use PRT::VirtualMachine::Master;
 use PRT::VirtualMachine::TestMachine;
 use PRT::VirtualMachine::Proxy;
 use Data::Dumper;
+
+my $hypervisor = PRT::Hypervisor->new(logger => $PRT::Logger::main_logger);
+
+exit();
 
 # Setup puppet master
 our $puppet_master = PRT::VirtualMachine::Master->new
