@@ -20,8 +20,6 @@ use Data::Dumper;
 
 my $hypervisor = PRT::Hypervisor->new(logger => $PRT::Logger::main_logger);
 
-exit();
-
 # Setup puppet master
 our $puppet_master = PRT::VirtualMachine::Master->new
 (
